@@ -9,7 +9,6 @@ from google_trans_new import google_translator
 from deep_translator import GoogleTranslator
 from bing_image_downloader.downloader import download
 
-# from io import BytesIO
 from bs4 import BeautifulSoup
 
 import requests
@@ -23,24 +22,6 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 
 
-
-
-#I want to create an image in the screen
-# (1) In order to create an image (COMPLETED)
-#Call Google Images -> Use sys commands to store into image folder -> retrieve image folder -> display using ImageTk.PhotoImage(Image.open('file'))
-#To delete an image at the end when the user exits the MAIN window (saving to excel file).
-#Save the images in a local directory
-#(1a) (COMPLETED)
-#Work on UI design first, where the buttons are located and what functions they do.
-# (2) Put the Viet Word on the screen
-#Through Text/Label
-# (3) User Inputs
-# Entry for text answer, button to save and exit, button to give up, (future) button to switch languages and keyboards
-# Could have a hint button, outputing the definition in English, using the Viet Word in a sentence (English and Viet)
-# (4) Save the user's input
-# Cmd lines to save in a diff directory for an excel/csv, append to it
-# while function is running, could have a check to see if the "random word" exists within the excel/csv
-# Prompt the user to save the word if they want to the excel/csv
 
 load_dotenv()
 translator = google_translator()
@@ -976,45 +957,6 @@ def main_screen():
 
 
     mainScreen.mainloop()
-
-
-#Get a Viet Website (Fairy Tales, the news, etc.)
-#Get a random sentence (using HTML or other means)
-#Guess each individual word within the sentence sequentially (guess the words from beginning to end)
-#should only be nouns, verbs, and adjectives
-#no grammar phrases (however, also, consquently, and ...)
-#Would add each of these words into a list -> Excel
-#At the end would show you the full translation (to the Google Translate's best).
-
-
-
-#A Review Tab (PRIORITY 2)
-#Accesses you local excel file (which the program creates). Must be initially populated (i.e., user must go through Random Word Generator)
-#Similar to random word generator??
-#Maybe have an easy/hard mode
-
-
-#An exit Tab
-#Would create the excel file that is to be populated,
-
-#3 THINGS TO GO ON
-#Viet Word
-#English Word
-#Associated Image
-
-#Append words at the end of the excel
-
-#Extra Features
-    #Sending an email with an attachment of all of the new words and reviewed words.
-    #A pronounciation tab (using Google Translate)
-    #Maybe writing?? (Touchscreen)
-    #Create a tutorial
-    #How to save the excel file in different directories?? Command line and menubar.
-    #Automate the process
-
-
-
-
 
 main_screen()
 
