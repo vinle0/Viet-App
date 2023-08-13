@@ -1,6 +1,5 @@
 from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 
 from PIL import ImageTk, Image
 
@@ -16,13 +15,12 @@ import tempfile
 import sys, os
 import random
 import re
-from openpyxl import Workbook
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 
 translator = google_translator()
-
 global script_dir
 
+#Sets the functionality of running the .exe or the .py
 if getattr(sys, 'frozen', False):
     script_dir = os.path.dirname(sys.executable)
 elif __file__:
@@ -32,19 +30,16 @@ elif __file__:
 _search_params = {
     'query_search' : 'default', #Will change
     'limit' : 1,
-    # 'format': 'jpg',
-    # 'print_urls': True,
     'output_dir': 'Images',
     'filter': 'photo',
-    # 'size':'medium'
     'verbose': False
 }
 
-
-#append the word to the excel sheet
+#save_word
+#Pre: Inputs an english word with a vietnamese word
+#Post: append the word to the excel sheet
 def save_word(word, viet):
     path = os.path.join(script_dir, 'Review')
-    # workbook = Workbook()
 
     if os.path.exists(path) == False: #Create a new Review Folder
         os.mkdir(path)
@@ -52,7 +47,6 @@ def save_word(word, viet):
     os.chdir(rf"{path}") #IN the review tab
 
     path = os.path.join(path, 'Review.xlsx')
-
 
     if os.path.exists(path) == False:
         workbook = Workbook()
@@ -65,9 +59,6 @@ def save_word(word, viet):
             sheet.append(row)
 
     else:
-        #Put all of the default
-        #Must put a header first before append
-        #Need to open the workbook, assumed to have the copies of the   words,
         workbook = load_workbook(filename='Review.xlsx')
         wordData = [[viet, word]]
         sheet = workbook.active
@@ -80,6 +71,9 @@ def save_word(word, viet):
     workbook.save(path) #Will save the localWorkBook
     os.chdir("..")
 
+#translate_word
+#Pre: Input an english word
+#Post: Change the global variable viet_word to contain the translated word
 def translate_word(word):
     try:
         viet_word = translator.translate(word, lang_tgt='vi', lang_src='en')
@@ -91,6 +85,9 @@ def translate_word(word):
 
     return viet_word
 
+#add_viet_word
+#Pre: Input an english word
+#Post: Output to the random screen the vietnamese text
 def add_viet_word(word):
     global viet_label
     viet_frame = ttk.Frame(SCREEN_RAND)
@@ -104,8 +101,10 @@ def add_viet_word(word):
     viet_label = ttk.Label(viet_frame, text=viet_word_to_save, font=('Helvetica bold', 20))
     viet_label.grid(row=0,column=0)
 
+#give_up
+#Pre: None
+#Post: A messagebox on whether or not to give up and save the word
 def give_up():
-    #ask if they really want to quit
     if messagebox.askyesno(message=f"Do you really want to give up?", title="Don't give up!") == True:
         if messagebox.askquestion(message=f"That's okay! The word is \"{CURR_WORD}\". Do you want to save?", title="'Til Next Time!") == "yes":
             save_word(CURR_WORD, viet_word_to_save)
@@ -124,21 +123,22 @@ def get_hint(word):
             defineDict = dict["definitions"][0]
             definition = defineDict["definition"]
 
-
     messagebox.showinfo(message=f"Definition: {definition}", title="Definition")
 
+#open_menu
+#Pre: Input to a ttk screen
+#Post: Exit out of the current screen and return to main screen
 def open_menu(screen):
     exit_out(screen)
 
+#check_correct
+#Pre: The user inputed word and the current word (currW) that is to be guessed
+#Post: Returns a success or failure through a messagebox
 def check_correct(word, currW):
     #clear entry field
     ENTRY_TEXT.delete(0, END)
-    #word is user input
-    #currW NEEDS synonyms, so
-    #currW goes through the dictionary with synonyms -> Place them in the a list -> check the word against list(currW)
     word = word.lower() #lowercase
     word = word.strip() #no whitespace
-
 
     if word == currW: #the values are the same
         if messagebox.askquestion(message=f"That is the correct word! Word is \"{CURR_WORD}\". Would you like to save?", title="Correct") == "yes":
@@ -147,15 +147,23 @@ def check_correct(word, currW):
     else:
         messagebox.showwarning(message="That is not the correct word! Try again.", title="Wrong")
 
+#get_random_word
+#Pre: A list of words
+#Post: Picks a random word and downloads an image, adds the image to the GUI, and add the viet word
 def get_random_word(words):
     random_word = words[random.randint(0,2999)]
     global CURR_WORD
     CURR_WORD = '' + random_word #put in global current word a copy
 
+    #insert check_duplicate here
+
     add_image(random_word) #Add the word into the Images Folder
     get_image(random_word, SCREEN_P)
     add_viet_word(random_word)
 
+#add_image
+#Pre: Input an english word
+#Post: Downloads an image in the local "Images" Folder
 def add_image(word):
     fileName = word
     _search_params['query_search'] = word
@@ -169,6 +177,9 @@ def add_image(word):
     except:
         print("Error DOWNLOADING!")
 
+#get_image
+#Pre: Inputs an english word, and the screen it wants to output to
+#Post: Retrieves the specific image within the "Images" Folder to output
 def get_image(word, screen):
     # script_dir = os.path.dirname(os.path.abspath(__file__)) #<-- absolute dir the script is in
     path = os.path.join(script_dir, "Images", word) #Get the first result
@@ -190,6 +201,10 @@ def get_image(word, screen):
     random_image.image = photo #contain another reference
     random_image.grid(row=0, column=0, sticky="nwes")
 
+
+#initialize_list
+#Pre: None
+#Post: Given a specific word site, web scrapes it for the 3000 words, returns a list of words
 def initalize_list():
 
     word_site = "https://www.ef.edu/english-resources/english-vocabulary/top-3000-words/"
@@ -208,9 +223,15 @@ def initalize_list():
     WORDS_LIST = list(WORDS_LIST)
     WORDS_LIST = [str(x) for x in WORDS_LIST] #convert to string as list comprehension
 
+#handler
+#Pre: event namespace
+#Post: Used when pressing enter, check to see if the user's input is correct
 def handler(event):
     check_correct(USER_INPUT.get(), CURR_WORD)
 
+#learn_random
+#Pre: None
+#Post: Outputs the necessary widgets of learning a random word
 def learn_random():
     global SCREEN_RAND
     global SCREEN_P
@@ -265,14 +286,18 @@ def learn_random():
         USER_INPUT.get(), CURR_WORD))
     enter_button.grid(row=1, column=2,padx=5, pady=5, ipady=5, ipadx=5)
 
-
-
     get_random_word(WORDS_LIST)
     SCREEN_RAND.bind('<Return>', handler)
 
+#handler_enter_word
+#Pre: event namespace
+#Post: Used for the review_tab when trying to locate a specific word in the Excel
 def handler_enter_word(event):
     enter_word(NEW_WORD.get())
 
+#random_review
+#Pre: None
+#Post: Outputs the necessary widgets of reviewing learned words
 def random_review():
 
     path = os.path.join(script_dir, 'Review')
@@ -308,13 +333,13 @@ def random_review():
     os.chdir("..")
 
 
-#At row+1, get the word
+#load_notebook
+#Pre: Vietnamese word, english word
+#Post: Modfies the Notebook widget in the Review Tab for the Picture, Word, English, and Viet Tabs
 def load_notebook(viet_word, word):
-    #Given a word,
-    #Output an image, english and viet example sentences
+
     global define
     global eng_sent
-
 
     get_image(word, Picture_Frame) #load image onto the Picture Frame
     word_site = f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}'
@@ -335,7 +360,6 @@ def load_notebook(viet_word, word):
             else:
                 eng_sent = "There is no example." #Could set to a definition?
         #break out of the very FIRST example, getting the additional definition
-
 
     global define_label
     global example_label
@@ -404,6 +428,9 @@ def load_notebook(viet_word, word):
     eng_sent_label.grid(row=3, column=1)
     viet_sent_label.grid(row=3, column=1)
 
+#forward_row
+#Pre: current row number of Excel
+#Post: Updates the forward button on the review tab to move to the next entry of Excel
 def forward_row(row):
     # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
     path = os.path.join(script_dir, 'Review')
@@ -430,6 +457,10 @@ def forward_row(row):
     os.chdir("..")
 
     load_notebook(viet_word, word)
+
+#backword_row
+#Pre: current row number of Excel
+#Post: Updates the backwards button on the review tab to move to the previous entry of Excel
 def backward_row(row):
     # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
     path = os.path.join(script_dir, 'Review')
@@ -458,6 +489,9 @@ def backward_row(row):
 
     load_notebook(viet_word, word)
 
+#check_dupliacate
+#Pre: A english word, the excel workbook
+#Post: Returns the row index of the word. If not found, return a -1 (indicates a new word)
 def check_duplicate(word, sheet):
     row=2
     found = False
@@ -475,6 +509,9 @@ def check_duplicate(word, sheet):
     else:
         return -1
 
+#enter_word
+#Pre: An english word
+#Post: Appends the Excel Sheet with the corresponding english and vietnamese word
 def enter_word(word):
     #append to the worksheet what word you want, and pass it through load_notebook
     # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
@@ -528,14 +565,16 @@ def enter_word(word):
 
     load_notebook(viet_word, word)  #load the notebook after chdir
 
+
+#open_excel
+#Pre: None
+#Post: Opens a notepad .txt file that contains the Excel Sheet as a temporary file
 def open_excel():
-    # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
     path = os.path.join(script_dir, 'Review')
     os.chdir(rf"{path}")
 
     workbook = load_workbook(filename='Review.xlsx')
     sheet = workbook.active
-
 
     os.chdir("..")
 
@@ -552,6 +591,11 @@ def open_excel():
 
         f.close()
 
+#translate_individual
+#Pre: None
+#Post: At the current position of the Review Tab, translate the individual
+#words of the english examples and definitions word by word. This reinforces
+#vocabularly at an individual level
 
 #Within the english sentence, for however many words there are, set them equal to a viet word
     #e.g. "There is no example"
@@ -559,8 +603,6 @@ def open_excel():
     # "is" = La
     # 'no' = khong
     # 'example' = vi du
-        #Add a notebook tab that "breaks" down the sentence
-        #Picture, Word, Eng and Viet, Breakdown of example/definition 2 SEPARATE NOTEBOOKS, one for eng one for viet
 def translate_individual():
     #from the english definition and example
     #define and eng_sent
@@ -593,7 +635,9 @@ def translate_individual():
 
         f.close()
 
-
+#review_words
+#Pre: None
+#Post: Outputs the necessary widgets to create the Reviews windows
 def review_words():
     global REVIEW_SCREEN
     REVIEW_SCREEN = Toplevel(mainScreen)
@@ -731,6 +775,10 @@ def review_words():
 
     REVIEW_SCREEN.bind('<Return>', handler_enter_word)
 
+
+#display_info
+#Pre: The current window as a key
+#Post: Depending on the key, will give different info regarding instructions for the current opened window
 def display_info(box):
     if box == "main_info":
         messagebox.showinfo(message="Guess the word in English/Vietnamese based on an image and its word.", title="Random Words")
@@ -744,18 +792,21 @@ def display_info(box):
         messagebox.showinfo(message=r"The 'individual' button returns the individual translation of each word in the example and definition.", title="Review Words")
         messagebox.showinfo(message="Random button returns a random entry.", title="Review Words")
         messagebox.showinfo(message=r"'Excel' opens up the current excel word list.", title="Review Words")
-
+#exit_out
+#Pre: A ttk screen
+#Post: Outputs a message box to ask the user to quit the window and close it out
 def exit_out(screen):
     if messagebox.askquestion(message="Are you sure you want to quit?", title="Exit current tab") == "yes":
         screen.destroy()
         root.state("normal")
 
-#UI
+#main_screen
+#Pre: None
+#Post: Outputs the necessary widgets on the Main window (main menu)
 def main_screen():
     global mainScreen
     global root
     root = Tk()
-
 
     global viet_label
     global define_label
@@ -767,7 +818,6 @@ def main_screen():
     global eng_sent_label
     global viet_sent_label
     global word_label
-    # global viet_label
 
     define_label = ttk.Label(root)
     example_label = ttk.Label(root)
@@ -787,7 +837,6 @@ def main_screen():
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     root.resizable(FALSE,FALSE)
-
 
     mainScreen = ttk.Frame(root, padding=(0,10,0,0)) #bot, top, right, left
     mainScreen.grid(row=0, column=0, sticky=(N, W, E, S))
