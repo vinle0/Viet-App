@@ -115,7 +115,6 @@ def give_up():
 
 def get_hint(word):
     #search up the definition and classifer (noun, verb, adjective, etc.)
-    #Again using dictionary
     word_site = f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}'
     response = requests.get(word_site)
     content = response.json()
@@ -153,14 +152,11 @@ def get_random_word(words):
     global CURR_WORD
     CURR_WORD = '' + random_word #put in global current word a copy
 
-    #search through the list of known words, returns a boolean whether or not the word is "unique"
-
     add_image(random_word) #Add the word into the Images Folder
     get_image(random_word, SCREEN_P)
     add_viet_word(random_word)
 
 def add_image(word):
-    # script_dir = os.path.dirname(os.path.abspath(__file__)) #<-- absolute dir the script is in
     fileName = word
     _search_params['query_search'] = word
 
@@ -185,10 +181,7 @@ def get_image(word, screen):
         for file in files:
             path = os.path.join(path, file)
 
-
-
     image_ = Image.open(path)
-    # print(os.path.basename(rf'{path}'))
 
     n_image = image_.resize((320, 320))
 
@@ -198,7 +191,7 @@ def get_image(word, screen):
     random_image.grid(row=0, column=0, sticky="nwes")
 
 def initalize_list():
-    #probably initalize website once in the mainScreen
+
     word_site = "https://www.ef.edu/english-resources/english-vocabulary/top-3000-words/"
 
     response = requests.get(word_site)
@@ -276,21 +269,12 @@ def learn_random():
 
     get_random_word(WORDS_LIST)
     SCREEN_RAND.bind('<Return>', handler)
-    # SCREEN_RAND.bind('<Escape>',  open_menu(SCREEN_RAND))
 
-    #random_review
-        #Assume that worksheet has been created already
-        #Get a random word to review from the excel
-        #Return the english word
-        #serve as input to load_notebook, translating and outputing images
-
-##########################################################################################################################
 def handler_enter_word(event):
     enter_word(NEW_WORD.get())
 
 def random_review():
 
-    # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
     path = os.path.join(script_dir, 'Review')
     os.chdir(rf"{path}") #IN the review tab
 
@@ -299,13 +283,9 @@ def random_review():
 
     num_rows = sheet.max_row #exclude the headers
     random_row_num = random.randint(2, num_rows) #inclusive
-    # for row in sheet.iter_rows(min_row=random_row_num, max_row=random_row_num, values_only=True):
-    #     word = row[1] #English word
 
     right_button = ttk.Button(lower_buttons_frame, text=">>", command=lambda : forward_row(random_row_num+1))
     left_button = ttk.Button(lower_buttons_frame, text="<<", command=lambda  : backward_row(random_row_num-1))
-
-    # update the buttons with the new rule
 
     if(random_row_num is sheet.max_row):
         #set the button to disable
@@ -327,7 +307,6 @@ def random_review():
     workbook.save(path) #Will save the localWorkBook
     os.chdir("..")
 
-    #next is to load_notebook with the associated word
 
 #At row+1, get the word
 def load_notebook(viet_word, word):
@@ -358,9 +337,6 @@ def load_notebook(viet_word, word):
         #break out of the very FIRST example, getting the additional definition
 
 
-    #Include the WORD ITSELF
-
-
     global define_label
     global example_label
     global define_label_v
@@ -382,7 +358,11 @@ def load_notebook(viet_word, word):
     word_label.destroy()
     viet_label.destroy()
 
-    #eng_sent could be empty, try and catch statement
+    eng_define_label.destroy()
+    viet_define_label.destroy()
+
+    eng_sent_label.destroy()
+    viet_sent_label.destroy()
 
     viet_sent = translate_word(eng_sent) #outputs a viet sentence
     viet_define = translate_word(define)
@@ -409,14 +389,6 @@ def load_notebook(viet_word, word):
     viet_label.place(relx=0.5, rely=0.7, anchor=CENTER)
 
     #end of headers
-
-
-
-    eng_define_label.destroy()
-    viet_define_label.destroy()
-
-    eng_sent_label.destroy()
-    viet_sent_label.destroy()
 
     eng_define_label = ttk.Label(En_Frame, text=define, font=('Helvetica bold', 12),wraplength=190, justify=LEFT)
     viet_define_label = ttk.Label(Viet_Frame, text=viet_define, font=('Helvetica bold', 12), wraplength=190, justify=LEFT)
@@ -534,10 +506,7 @@ def enter_word(word):
         right_button.grid(row=1, column=4)
         left_button.grid(row=1, column=0)
 
-
-    #else, go the row of the word? Update the buttons,
     else:
-
 
         right_button = ttk.Button(lower_buttons_frame, text=">>", command= lambda :forward_row(row_num+1))
         left_button = ttk.Button(lower_buttons_frame, text="<<", command= lambda  : backward_row(row_num-1))
@@ -550,21 +519,14 @@ def enter_word(word):
             #set the button to disable
             left_button = ttk.Button(lower_buttons_frame, text="<<", state=DISABLED)
 
-
         right_button.grid(row=1, column=4)
         left_button.grid(row=1, column=0)
-
 
     path = os.path.join(path, "Review.xlsx")
     workbook.save(path) #Will save the localWorkBook
     os.chdir("..")
 
-
     load_notebook(viet_word, word)  #load the notebook after chdir
-
-#Make a button to print the excel onto a impromptu window
-    #OUTPUT to a .txt file instead
-    #Make this similar to the info_box!
 
 def open_excel():
     # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
@@ -589,19 +551,7 @@ def open_excel():
         process = sp.Popen([programName, fileName])
 
         f.close()
-        # os.unlink(f.name)
 
-
-#create the file within review
-    #populate the file
-    #open the file
-
-
-#Re-size the windows and the notebook
-
-#Could do the library to write in viet
-#Learn how to hide the Pictures Folder
-#Could do a menubar to access an email/excel file.
 
 #Within the english sentence, for however many words there are, set them equal to a viet word
     #e.g. "There is no example"
@@ -611,7 +561,6 @@ def open_excel():
     # 'example' = vi du
         #Add a notebook tab that "breaks" down the sentence
         #Picture, Word, Eng and Viet, Breakdown of example/definition 2 SEPARATE NOTEBOOKS, one for eng one for viet
-
 def translate_individual():
     #from the english definition and example
     #define and eng_sent
@@ -636,8 +585,6 @@ def translate_individual():
             x = 20 - len(word)
             f.write(f"{word}{' ' * x}{viet_translated}\n")
 
-
-
         f.flush()
 
         programName = 'notepad.exe'
@@ -646,27 +593,6 @@ def translate_individual():
 
         f.close()
 
-    #Get each word and translated it to viet
-        #Append the word to a text file
-    #open the .txt file using temp
-
-
-
-#Revisit how to get SYNONYMS for words
-#Email attachment
-#Could do a better traversal
-#Could have multiple excel sheets
-
-#Now, email, open_excel button, translate individual words (button)
-#could bind a event when closing a window
-
-
-#A tutorial button in the root screen?
-#make info buttons contain the text boxes
-
-#Rework the mainscreen buttons
-#Extra: Add a tutorial, could get audio, write in viet, get a window to login
-#Limit: Review.xlsx has to be within the Review Tab, similar to images, cannot open Review.xlsx while in program.
 
 def review_words():
     global REVIEW_SCREEN
@@ -757,13 +683,8 @@ def review_words():
     word = sheet.cell(row=2, column=2).value
     os.chdir("..")
 
-
     load_notebook(viet_word, word)
-    #Set a handler to enter
 
-
-
-    ############################################
     global lower_buttons_frame
     lower_buttons_frame = ttk.Labelframe(REVIEW_SCREEN, text="Entries")
     lower_buttons_frame.grid(row=2, column=0, rowspan=3, columnspan=5)
@@ -808,47 +729,7 @@ def review_words():
     individual_button = ttk.Button(lower_buttons_frame, text="Individual", command= lambda : translate_individual())
     individual_button.grid(row=2, column=0, padx=20)
 
-    ###########################################
-
-
-
     REVIEW_SCREEN.bind('<Return>', handler_enter_word)
-
-
-    #load_notebook
-        #load from the workbook
-        #if input, then search the row based on that input
-            #update the row number if input
-        #else continue on throughout the excel based on current row
-
-
-
-    #If there is nothing, populate the 'review.xlsx' with the word "hello, chao"
-        #Maybe make a function to make an excel sheet, taking a word, viet word.
-        #Appending it to the worksheet
-    #Will review the words from the excel
-        #Load the workbook
-        #Sentences, with the image
-        #If there isn't a word, then create a new word to review
-
-
-    #Create an entry widget with the word that the user wants to enter.
-        #This will create a new image and output to notebook
-        #When entering, the notebook is UPDATED
-
-    #Notebook Widget with 3 tabs
-        #Picture
-        #English sentences/Word
-        #Viet sentences/Word
-    #Get the sentences using dictionaryAPI by examples "hopefully"
-        #else show the words
-        #TranslateAPI
-    #Access the local pictures
-    #Arrow Buttons to go back and forth in the excel
-    #A random button to get a random row.
-
-    #Separate idea, delete the Image Library when finished when pressing exit.
-    #Learn how to hide image library
 
 def display_info(box):
     if box == "main_info":
@@ -863,7 +744,7 @@ def display_info(box):
         messagebox.showinfo(message=r"The 'individual' button returns the individual translation of each word in the example and definition.", title="Review Words")
         messagebox.showinfo(message="Random button returns a random entry.", title="Review Words")
         messagebox.showinfo(message=r"'Excel' opens up the current excel word list.", title="Review Words")
-#should include the parameter for what screen to close out
+
 def exit_out(screen):
     if messagebox.askquestion(message="Are you sure you want to quit?", title="Exit current tab") == "yes":
         screen.destroy()
@@ -874,10 +755,9 @@ def main_screen():
     global mainScreen
     global root
     root = Tk()
-    #This will rewrite over viet_label when outputing a new word
-    global viet_label
-    viet_label = ttk.Label(root)
 
+
+    global viet_label
     global define_label
     global example_label
     global define_label_v
@@ -898,8 +778,7 @@ def main_screen():
     eng_sent_label = ttk.Label(root)
     viet_sent_label = ttk.Label(root)
     word_label = ttk.Label(root)
-    # viet_label = ttk.Label(root)
-
+    viet_label = ttk.Label(root)
 
     initalize_list()
 
@@ -914,8 +793,6 @@ def main_screen():
     mainScreen.grid(row=0, column=0, sticky=(N, W, E, S))
     ttk.Label(mainScreen, padding=(5,5)).grid(row=0,column=0)
 
-
-
     learn = ttk.Label(mainScreen, relief="groove",text = "Learn a Random Word", font="Georgia 16", padding=(5,10))
     learn.grid(row=0, column=1, columnspan=1)
     rand = ttk.Button(mainScreen, text="Random Word", command = learn_random)
@@ -927,22 +804,14 @@ def main_screen():
     review =ttk.Button(mainScreen,text="Review", command = review_words)
     review.grid(row=3, column=1, columnspan=1 )
 
-
-    #include sentences later...
-
-
-    #No uses for now..
-    #Replace with send an email! Excel is saved automatically anyways, but could do a login to an email!
     exitL = ttk.Label(mainScreen, relief="groove", text = "Save and Exit", font="Georgia 16", padding=(5,10))
     exitL.grid(row=4, column=1, columnspan=1)
     exitB =ttk.Button(mainScreen,text="Exit", command= lambda: exit_out(root))
     exitB.grid(row=5, column=1, columnspan=1)
 
-
     infomationB = ttk.Button(mainScreen, text ="Info", command= lambda: display_info("main_info"))
     Label(mainScreen, text="").grid(row=6, column=1)
     infomationB.grid(row=7, column=1, columnspan=1)
-
 
     mainScreen.mainloop()
 
