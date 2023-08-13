@@ -4,7 +4,6 @@ from tkinter import messagebox
 
 from PIL import ImageTk, Image
 
-from dotenv import load_dotenv
 from google_trans_new import google_translator
 from deep_translator import GoogleTranslator
 from bing_image_downloader.downloader import download
@@ -15,20 +14,13 @@ import requests
 import subprocess as sp
 import tempfile
 import sys, os
-import json
 import random
 import re
 from openpyxl import Workbook
 from openpyxl import load_workbook
 
-
-
-load_dotenv()
 translator = google_translator()
 
-
-
-#environment variables
 global script_dir
 
 if getattr(sys, 'frozen', False):
@@ -36,9 +28,6 @@ if getattr(sys, 'frozen', False):
 elif __file__:
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
-
-
-# gis = GoogleImagesSearch(os.getenv("GCS_DEVELOPER_KEY"), os.getenv("GCS_CX"))
 #define search parameters, can change within functions
 _search_params = {
     'query_search' : 'default', #Will change
@@ -52,9 +41,8 @@ _search_params = {
 }
 
 
+#append the word to the excel sheet
 def save_word(word, viet):
-    #append the word to the excel sheet
-    # script_dir = os.path.dirname(os.path.abspath(__file__)) #absolute directory of the script
     path = os.path.join(script_dir, 'Review')
     # workbook = Workbook()
 
@@ -364,7 +352,7 @@ def load_notebook(viet_word, word):
                     eng_sent = defineDict["example"]
                 except:
                     eng_sent = "There is no example."
-                break;
+                break
             else:
                 eng_sent = "There is no example." #Could set to a definition?
         #break out of the very FIRST example, getting the additional definition
@@ -791,7 +779,7 @@ def review_words():
     global NEW_INPUT
 
     NEW_WORD = StringVar()
-    NEW_INPUT = ttk.Entry(lower_buttons_frame, width="20", textvariable = NEW_WORD)
+    NEW_INPUT = ttk.Entry(lower_buttons_frame, width=20, textvariable=NEW_WORD)
     NEW_INPUT.grid(row=1, column=2, padx=20, pady=5)
 
     row = 2 #start at the beginning of the document
