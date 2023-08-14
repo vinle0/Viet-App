@@ -832,7 +832,7 @@ def main_screen():
 
     initalize_list()
 
-    root.title(" My Viet Dict ")
+    root.title("Viet Dictionary")
     root.geometry("250x350") #x&y
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
